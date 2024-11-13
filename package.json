@@ -1,0 +1,29 @@
+{
+  "name": "librustore-apiwrapper",
+  "version": "0.1.0",
+  "description": "The RuStore API wrapper for LibRuStore",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LibRuStore/APIWrapper.git"
+  },
+  "keywords": [
+    "librustore",
+    "rustore",
+    "api"
+  ],
+  "author": "Milk-Cool",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LibRuStore/APIWrapper/issues"
+  },
+  "homepage": "https://github.com/LibRuStore/APIWrapper#readme",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
