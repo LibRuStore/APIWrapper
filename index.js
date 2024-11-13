@@ -12,12 +12,12 @@ export class App {
     /**
      * Constructs a new App from JSON.
      * 
-     * @param {{ text: string, packageName: string, iconUrl: string }} json The app JSON (as in /search)
+     * @param {{ text: string, packageName: string, iconUrl: string }?} json The app JSON (as in /search)
      */
     constructor(json) {
-        this.name = json.text;
-        this.pkg = json.packageName;
-        this.icon = json.iconUrl;
+        this.name = json?.text;
+        this.pkg = json?.packageName;
+        this.icon = json?.iconUrl;
         this.appID = -1;
     }
 
