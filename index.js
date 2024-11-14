@@ -1,5 +1,6 @@
 /** @typedef {{ fullName: string, company: string, shortDescription: string, fullDescription: string, age: string }} AppMeta */
 /** @typedef {{ url: string, orientation: string }} AppScreenshot */
+/** @typedef {{ appID: number, meta: AppMeta, latest: number, screenshots: AppScreenshot[], downloads: number }} AppInfo */
 
 /** @typedef { "armeabi-v7a" | "arm64-v8a" | "x86" | "x86_64" } ABI */
 
@@ -23,16 +24,16 @@ export class App {
 
     /**
      * Gets basic app info.
-     * Also stores the App ID for downloading.
      * 
-     * @returns {{ meta: AppMeta, latest: number, screenshots: AppScreenshot[], downloads: number }} The app info
+     * @param {string} pkg The package name
+     * @returns {AppInfo} The app info
      */
-    async getInfo() {
-        const f = await fetch(`https://backapi.rustore.ru/applicationData/overallInfo/${this.pkg}`);
+    static async getInfo(pkg) {
+        const f = await fetch(`https://backapi.rustore.ru/applicationData/overallInfo/${pkg}`);
         const j = await f.json();
         checkOK(j);
-        this.appID = j.body.appId;
         return {
+            "appID": j.body.appId,
             "meta": {
                 "fullName": j.body.appName,
                 "shortDescription": j.body.shortDescription,
@@ -47,25 +48,48 @@ export class App {
     }
 
     /**
+     * Same as the static method App.getInfo.
+     * Also stores the App ID for downloading.
+     * 
+     * @returns {AppInfo} The app info
+     */
+    async getInfo() {
+        const res = await App.getInfo(this.pkg);
+        this.appID = res.appID;
+        return res;
+    }
+
+    /**
      * Gets the download links for the app by ABI
      * 
+     * @param {number} appID The app ID
      * @param {ABI | ABI[]} abi The ABI
      * @returns {string[]} The download links
      */
-    async getDownloadLinks(abi) {
+    static async getDownloadLinks(appID, abi) {
         const f = await fetch("https://backapi.rustore.ru/applicationData/v2/download-link", {
             "method": "POST",
             "headers": {
                 "Content-Type": "application/json"
             },
             "body": JSON.stringify({
-                "appId": this.appID,
+                "appId": appID,
                 "supportedAbis": abi instanceof Array ? abi : [abi]
             })
         });
         const j = await f.json();
         checkOK(j);
         return j.body.downloadUrls.map(x => x.url);
+    }
+
+    /**
+     * Same as the static method App.getDownloadLinks.
+     * 
+     * @param {ABI | ABI[]} abi The ABI
+     * @returns {string[]} The download links
+     */
+    async getDownloadLinks(abi) {
+        return await App.getDownloadLinks(this.appID, abi);
     }
 }
 

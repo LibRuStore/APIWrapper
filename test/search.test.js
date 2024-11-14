@@ -1,4 +1,4 @@
-import { search } from "../index.js";
+import { search, App } from "../index.js";
 
 const res = await search("Дзен");
 const app = res.find(x => x.pkg === "ru.zen.android");
@@ -16,5 +16,15 @@ test("gets info about Dzen (no matching)", async () => {
 
 test("gets the download link for arm64-v8a (no matching)", async () => {
     const links = await app.getDownloadLinks("arm64-v8a");
+    console.log(links);
+});
+
+test("works with static methods for getting info (no matching)", async () => {
+    const info = await App.getInfo("com.uchi.app");
+    console.log(info);
+});
+
+test("works with static methods for getting download links (no matching)", async () => {
+    const links = await App.getDownloadLinks(1076671, "arm64-v8a");
     console.log(links);
 });
