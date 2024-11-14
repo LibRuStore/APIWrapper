@@ -94,6 +94,7 @@ export class App {
 }
 
 
+// FIXME: Not even nearly as many results are shown
 /**
  * Searches apps in RuStore.
  * 
