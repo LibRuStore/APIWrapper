@@ -104,5 +104,5 @@ export async function search(query) {
     const f = await fetch(`https://backapi.rustore.ru/search/suggest?query=${encodeURIComponent(query)}`);
     const j = await f.json();
     checkOK(j);
-    return j.body.suggests.map(x => new App(x));
+    return j.body.suggests.filter(x => x.packageName !== null).map(x => new App(x));
 }
