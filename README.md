@@ -14,8 +14,8 @@ npm i
 ```
 
 ## Usage (Library)
-### `search`
-Searches apps by search term. Returns `App[]`.
+### `preciseSearch`
+Searches apps by search term. Returns `App[]` which contains just the most relevant and popular apps.
 ```js
 import { search } from "librustore-apiwrapper";
 

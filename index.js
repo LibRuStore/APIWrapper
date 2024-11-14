@@ -34,13 +34,13 @@ export class App {
     /**
      * Constructs a new App from JSON.
      * 
-     * @param {{ text: string, packageName: string, iconUrl: string }?} json The app JSON (as in /search)
+     * @param {{ text?: string, appName?: string, packageName: string, iconUrl: string, appId: number }?} json The app JSON (as in /search)
      */
     constructor(json) {
-        this.name = json?.text;
+        this.name = json?.text ?? json?.appName;
         this.pkg = json?.packageName;
         this.icon = json?.iconUrl;
-        this.appID = -1;
+        this.appID = json?.appId ?? -1;
     }
 
     /**
@@ -106,14 +106,46 @@ export class App {
 }
 
 
-// FIXME: Not even nearly as many results are shown
 /**
  * Searches apps in RuStore.
+ * Supports pagination and returns all results.
+ * 
+ * @param {string} query The search query
+ * @param {number} page Page number
+ * @param {number} perPage Results per page
+ * @returns {App[]} The found apps
+ */
+export async function search(query, page, perPage) {
+    return (await searchWithPage(query, page, perPage)).apps;
+}
+
+/**
+ * Searches apps in RuStore.
+ * Supports pagination and returns all results.
+ * Also returns the total results number.
+ * 
+ * @param {string} query The search query
+ * @param {number} page Page number
+ * @param {number} perPage Results per page
+ * @returns {{ apps: App[], total: number }} The found apps with the total count
+ */
+export async function searchWithPage(query, page, perPage) {
+    const json = await ruStoreAPI(`/applicationData/apps?query=${encodeURIComponent(query)}&pageNumber=${page}&pageSize=${perPage}`);
+    return {
+        "apps": json.content.map(x => new App(x)),
+        "total": json.totalElements
+    };
+}
+
+/**
+ * Searches apps in RuStore.
+ * Only returns the most relevant and popular apps.
+ * It's not recommended to use this for searching.
  * 
  * @param {string} query The search query
  * @returns {App[]} The found apps
  */
-export async function search(query) {
+export async function preciseSearch(query) {
     const json = await ruStoreAPI(`/search/suggest?query=${encodeURIComponent(query)}`);
     return json.suggests.filter(x => x.packageName !== null).map(x => new App(x));
 }

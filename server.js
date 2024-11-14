@@ -1,4 +1,4 @@
-import { App, search } from "./index.js";
+import { App, searchWithPage } from "./index.js";
 import express from "express";
 
 const app = express();
@@ -20,14 +20,16 @@ const makeSuccess = data => {
 app.get("/search", async (req, res) => {
     const query = req.query.query;
     if(!query) return res.status(400).send(makeError("no query given"));
+    const page = req.query.page, perPage = req.query.per_page;
+    if(!page || !perPage) return res.status(400).send(makeError("no pagination set"));
     let searchResults;
     try {
-        searchResults = await search(query);
+        searchResults = await searchWithPage(query, parseInt(page), parseInt(perPage));
     } catch(_) {
         return res.status(500).send(makeError("server error"));
     }
-    const out = searchResults.map(app => ({ "name": app.name, "pkg": app.pkg, "icon": app.icon }));
-    res.status(200).send(makeSuccess(out));
+    searchResults.apps = searchResults.apps.map(app => ({ "name": app.name, "pkg": app.pkg, "icon": app.icon }));
+    res.status(200).send(makeSuccess(searchResults));
 });
 
 app.get("/info", async (req, res) => {

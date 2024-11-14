@@ -1,6 +1,6 @@
 import { search, App } from "../index.js";
 
-const res = await search("Дзен");
+const res = await search("Дзен", 0, 20);
 const app = res.find(x => x.pkg === "ru.zen.android");
 
 test("finds Dzen", () => {
