@@ -1,6 +1,6 @@
 {
   "name": "librustore-apiwrapper",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The RuStore API wrapper for LibRuStore",
   "main": "index.js",
   "type": "module",

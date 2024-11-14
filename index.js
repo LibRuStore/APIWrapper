@@ -88,7 +88,7 @@ export class App {
     static async getDownloadLinks(appID, abi) {
         const json = await ruStoreAPI("/applicationData/v2/download-link", {
             "appId": appID,
-            "supportedAbis": abi instanceof Array ? abi : [abi]
+            "supportedAbis": Array.isArray(abi) ? abi : [abi]
         });
         return json.downloadUrls.map(x => x.url);
     }
