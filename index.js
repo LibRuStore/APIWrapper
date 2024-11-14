@@ -61,6 +61,7 @@ export class App {
                 "age": json.ageLegal
             },
             "latest": json.versionCode,
+            "latestName": json.versionName,
             "downloads": json.downloads,
             "screenshots": json.fileUrls
         };
