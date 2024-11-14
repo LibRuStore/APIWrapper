@@ -9,6 +9,27 @@ function checkOK(j) {
 }
 
 
+/**
+ * Makes a request to RuStore's API.
+ * 
+ * @param {string} path The request path
+ * @param {object | null} body The request body
+ * @returns {object} The data
+ */
+async function ruStoreAPI(path, body = null) {
+    const res = await fetch(new URL(path, "https://backapi.rustore.ru").href, body ? {
+        "method": "POST",
+        "body": JSON.stringify(body),
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    } : {});
+    const json = await res.json();
+    checkOK(json);
+    return json.body;
+}
+
+
 export class App {
     /**
      * Constructs a new App from JSON.
@@ -29,21 +50,19 @@ export class App {
      * @returns {AppInfo} The app info
      */
     static async getInfo(pkg) {
-        const f = await fetch(`https://backapi.rustore.ru/applicationData/overallInfo/${pkg}`);
-        const j = await f.json();
-        checkOK(j);
+        const json = await ruStoreAPI(`/applicationData/overallInfo/${pkg}`);
         return {
-            "appID": j.body.appId,
+            "appID": json.appId,
             "meta": {
-                "fullName": j.body.appName,
-                "shortDescription": j.body.shortDescription,
-                "fullDescription": j.body.fullDescription,
-                "company": j.body.companyName,
-                "age": j.body.ageLegal
+                "fullName": json.appName,
+                "shortDescription": json.shortDescription,
+                "fullDescription": json.fullDescription,
+                "company": json.companyName,
+                "age": json.ageLegal
             },
-            "latest": j.body.versionCode,
-            "downloads": j.body.downloads,
-            "screenshots": j.body.fileUrls
+            "latest": json.versionCode,
+            "downloads": json.downloads,
+            "screenshots": json.fileUrls
         };
     }
 
@@ -67,19 +86,11 @@ export class App {
      * @returns {string[]} The download links
      */
     static async getDownloadLinks(appID, abi) {
-        const f = await fetch("https://backapi.rustore.ru/applicationData/v2/download-link", {
-            "method": "POST",
-            "headers": {
-                "Content-Type": "application/json"
-            },
-            "body": JSON.stringify({
-                "appId": appID,
-                "supportedAbis": abi instanceof Array ? abi : [abi]
-            })
+        const json = await ruStoreAPI("/applicationData/v2/download-link", {
+            "appId": appID,
+            "supportedAbis": abi instanceof Array ? abi : [abi]
         });
-        const j = await f.json();
-        checkOK(j);
-        return j.body.downloadUrls.map(x => x.url);
+        return json.downloadUrls.map(x => x.url);
     }
 
     /**
@@ -102,8 +113,6 @@ export class App {
  * @returns {App[]} The found apps
  */
 export async function search(query) {
-    const f = await fetch(`https://backapi.rustore.ru/search/suggest?query=${encodeURIComponent(query)}`);
-    const j = await f.json();
-    checkOK(j);
-    return j.body.suggests.filter(x => x.packageName !== null).map(x => new App(x));
+    const json = await ruStoreAPI(`/search/suggest?query=${encodeURIComponent(query)}`);
+    return json.suggests.filter(x => x.packageName !== null).map(x => new App(x));
 }
