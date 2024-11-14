@@ -20,8 +20,18 @@ Searches apps by search term. Returns `App[]` which contains just the most relev
 import { search } from "librustore-apiwrapper";
 
 (async () => {
-    const apps = await search("Дзен");
+    const apps = await preciseSearch("Дзен");
     console.log(apps); // Outputs a package with ID ru.zen.android
+})();
+```
+### `search`
+Searches apps by search term. Supports pagination. Returns `App[]`.
+```js
+import { search } from "librustore-apiwrapper";
+
+(async () => {
+    const apps = await search("Дзен", 0, 20); // where 0 is the page number and 20 is the amount of results per page
+    console.log(apps); // Outputs a list with a package with ID ru.zen.android
 })();
 ```
 
