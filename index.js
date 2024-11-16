@@ -1,6 +1,6 @@
 /** @typedef {{ fullName: string, company: string, shortDescription: string, fullDescription: string, age: string }} AppMeta */
 /** @typedef {{ url: string, orientation: string }} AppScreenshot */
-/** @typedef {{ appID: number, meta: AppMeta, latest: number, screenshots: AppScreenshot[], downloads: number }} AppInfo */
+/** @typedef {{ appID: number, meta: AppMeta, latest: number, screenshots: AppScreenshot[], icon: string, downloads: number }} AppInfo */
 /** @typedef {{ pkg: string, latest: number }} AppVersion */
 
 /** @typedef { "armeabi-v7a" | "arm64-v8a" | "x86" | "x86_64" } ABI */
@@ -61,6 +61,7 @@ export class App {
                 "company": json.companyName,
                 "age": json.ageLegal
             },
+            "icon": json.iconUrl,
             "latest": json.versionCode,
             "latestName": json.versionName,
             "downloads": json.downloads,
