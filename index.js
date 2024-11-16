@@ -1,11 +1,12 @@
 /** @typedef {{ fullName: string, company: string, shortDescription: string, fullDescription: string, age: string }} AppMeta */
 /** @typedef {{ url: string, orientation: string }} AppScreenshot */
 /** @typedef {{ appID: number, meta: AppMeta, latest: number, screenshots: AppScreenshot[], downloads: number }} AppInfo */
+/** @typedef {{ pkg: string, latest: number }} AppVersion */
 
 /** @typedef { "armeabi-v7a" | "arm64-v8a" | "x86" | "x86_64" } ABI */
 
 function checkOK(j) {
-    if(j.code != "OK") throw new Error("Request failed: " + j.code);
+    if(j.code != "OK") throw new Error("Request failed: " + j.message ?? j.code);
 }
 
 
@@ -148,4 +149,17 @@ export async function searchWithPage(query, page, perPage) {
 export async function preciseSearch(query) {
     const json = await ruStoreAPI(`/search/suggest?query=${encodeURIComponent(query)}`);
     return json.suggests.filter(x => x.packageName !== null).map(x => new App(x));
+}
+
+/**
+ * Checks for app updates.
+ * 
+ * @param {string[]} apps The app bundle IDs
+ * @returns {AppVersion[]} The apps' bundle IDs with versions included
+ */
+export async function checkUpdates(apps) {
+    const json = await ruStoreAPI("/applicationData/newApps", {
+        "content": apps.map(x => ({ "packageName": x, "versionCode": 0 }))
+    });
+    return json.content.map(x => ({ "latest": x.versionCode, "pkg": x.packageName }));
 }

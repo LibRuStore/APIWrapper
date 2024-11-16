@@ -1,4 +1,4 @@
-import { search, App } from "../index.js";
+import { search, App, checkUpdates } from "../index.js";
 
 const res = await search("Дзен", 0, 20);
 const app = res.find(x => x.pkg === "ru.zen.android");
@@ -27,4 +27,10 @@ test("works with static methods for getting info (no matching)", async () => {
 test("works with static methods for getting download links (no matching)", async () => {
     const links = await App.getDownloadLinks(1076671, "arm64-v8a");
     console.log(links);
+});
+
+test("checks updates", async () => {
+    const pkg = "com.avito.android";
+    const updates = await checkUpdates([pkg]);
+    expect(updates.find(x => x.pkg === pkg)).toBeDefined();
 });

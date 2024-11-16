@@ -1,7 +1,8 @@
-import { App, searchWithPage } from "./index.js";
+import { App, searchWithPage, checkUpdates } from "./index.js";
 import express from "express";
 
 const app = express();
+app.use(express.json());
 
 const makeError = text => {
     return {
@@ -56,6 +57,28 @@ app.get("/apk", async (req, res) => {
         return res.status(500).send(makeError("server error"));
     }
     res.status(200).send(makeSuccess(urls));
-})
+});
+
+const reqUpdates = async (apps, res) => {
+    let updates;
+    try {
+        updates = await checkUpdates(apps);
+    } catch(_) {
+        return res.status(500).send(makeError("server error"));
+    }
+    res.status(200).send(makeSuccess(updates));
+}
+
+app.post("/updates", async (req, res) => {
+    const apps = req.body;
+    if(!Array.isArray(apps)) return res.status(400).send(makeError("apps are not an array"));
+    return await reqUpdates(apps, res);
+});
+
+app.get("/updates", async (req, res) => {
+    const apps = req.query.apps;
+    if(!apps) return res.status(400).send(makeError("no apps provided"));
+    return await reqUpdates(apps.split(","), res);
+});
 
 app.listen(12700);
